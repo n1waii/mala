@@ -1,6 +1,7 @@
 enum Token {
     INTEGER, STRING, IDENTIFIER, LEFT_PARENTHESIS, 
-    RIGHT_PARENTHESIS, SEMICOLON, ASSIGNMENT, UNKNOWN
+    RIGHT_PARENTHESIS, SEMICOLON, ASSIGNMENT, UNKNOWN,
+    IF, AND, OR, FUNCTION
 }
 
 public class Lexeme {
@@ -8,8 +9,9 @@ public class Lexeme {
     private int line;
     private int column;
 
-    public Lexeme(Token token, int line, int column) {
+    public Lexeme(Token token, value, int line, int column) {
         this.token = token;
+        this.value = value;
         this.line = line;
         this.column = column;
     }
@@ -24,6 +26,10 @@ public class Lexeme {
 
     public Token getToken() {
         return this.token;
+    }
+    
+    public Token getValue() {
+        return this.value;
     }
 }
 
