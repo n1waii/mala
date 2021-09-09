@@ -1,15 +1,19 @@
+package compiler;
+
 enum Token {
-    INTEGER, STRING, IDENTIFIER, LEFT_PARENTHESIS, 
+    NUMBER, STRING, IDENTIFIER, LEFT_PARENTHESIS, 
     RIGHT_PARENTHESIS, SEMICOLON, ASSIGNMENT, UNKNOWN,
-    IF, AND, OR, FUNCTION
+    COMP_EQUAL, COMP_GREATER, COMP_LESS, COMP_LESS_EQUAL, COMP_GREATER_EQUAL,
+    IF, AND, OR, FUNCTION, LET, RETURN
 }
 
 public class Lexeme {
     private Token token;
     private int line;
     private int column;
+    private String value;
 
-    public Lexeme(Token token, value, int line, int column) {
+    public Lexeme(Token token, String value, int line, int column) {
         this.token = token;
         this.value = value;
         this.line = line;
@@ -28,8 +32,18 @@ public class Lexeme {
         return this.token;
     }
     
-    public Token getValue() {
+    public String getValue() {
         return this.value;
+    }
+
+    public String toString() {
+        return String.format("""
+        {
+            Token: %s,
+            Value: %s,
+            Line, Column: %i %i
+        }
+        """, this.getToken().toString(), this.getValue(), this.getLine(), this.getColumn());
     }
 }
 
