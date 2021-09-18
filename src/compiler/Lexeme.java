@@ -1,4 +1,4 @@
-package compiler;
+package src.compiler;
 
 enum Token {
     NUMBER, STRING, IDENTIFIER, LEFT_PARENTHESIS, 
@@ -41,7 +41,7 @@ public class Lexeme {
         {
             Token: %s,
             Value: %s,
-            Line, Column: %i %i
+            Line, Column: %d %d
         }
         """, this.getToken().toString(), this.getValue(), this.getLine(), this.getColumn());
     }

@@ -1,13 +1,4 @@
-/*
-public enum LexerState {
-    FREE,
-    DEFINING,
-    ASSIGNING,
-    BRANCHING,
-
-}
-*/
-package compiler;
+package src.compiler;
 
 import java.util.HashMap;
 import java.util.regex.Pattern;
@@ -27,6 +18,7 @@ public class Lexer {
 
     public Lexer(String input) {
         this.input = input;
+        this.cursor = 0;
         compile_regex();
         load_reserved();
     }
@@ -42,7 +34,6 @@ public class Lexer {
         if (this.isExhausted()) {
             return null;
         }
-
         return Character.toString(this.input.charAt(this.cursor));
     }
 
@@ -74,17 +65,19 @@ public class Lexer {
         // invalid: 123foo (cannot start with digit)
         StringBuilder lexemeValue = new StringBuilder();
         String currentChar = this.getCurrentCharacter();
+        int columnStart = this.getCursorColumn();
 
-        while (findMatch(MATCH_TYPE.CHAR, currentChar) || findMatch(MATCH_TYPE.DIGIT, currentChar)) {
-            lexemeValue.append(this.getCurrentCharacter());
+        while (!this.isExhausted() && (findMatch(MATCH_TYPE.CHAR, currentChar) || findMatch(MATCH_TYPE.DIGIT, currentChar))) {
+            lexemeValue.append(currentChar);
             this.cursorForward();
+            currentChar = this.getCurrentCharacter();
         }
- 
+
         return new Lexeme(
             Token.IDENTIFIER, 
             lexemeValue.toString(), 
             this.getCursorLine(),
-            this.getCursorColumn()
+            columnStart
         );
     }
 
@@ -94,8 +87,10 @@ public class Lexer {
         // i.e 0001 becomes 1
 
         StringBuilder lexemeValue = new StringBuilder();
+        int columnStart = this.getCursorColumn();
 
-        while (findMatch(MATCH_TYPE.DIGIT, this.getCurrentCharacter())) {
+        while (!this.isExhausted() && 
+            (findMatch(MATCH_TYPE.DIGIT, this.getCurrentCharacter()) || findMatch(MATCH_TYPE.DOT, this.getCurrentCharacter()))) {
             lexemeValue.append(this.getCurrentCharacter());
             this.cursorForward();
         }
@@ -104,13 +99,15 @@ public class Lexer {
             Token.NUMBER, 
             lexemeValue.toString(), 
             this.getCursorLine(),
-            this.getCursorColumn()
+            columnStart
         );    
     }
 
     private Lexeme findEqualSequence() {
         this.cursorForward();
+    
         String value = "";
+        int columnStart = this.getCursorColumn();
         Token token;
 
         if (findMatch(MATCH_TYPE.EQUAL, this.getCurrentCharacter())) {
@@ -125,7 +122,7 @@ public class Lexer {
             token, 
             value, 
             this.getCursorLine(),
-            this.getCursorColumn()
+            columnStart
         );
     }
 
@@ -157,7 +154,7 @@ public class Lexer {
     }
 
     public boolean isExhausted() {
-        return this.cursor > input.length();
+        return this.cursor+1 > input.length();
     }
 
     public int getCursorLine() {
@@ -170,9 +167,9 @@ public class Lexer {
 
     private static void compile_regex() {
         regex_patterns.put(MATCH_TYPE.DIGIT, Pattern.compile("\\d"));
-        regex_patterns.put(MATCH_TYPE.CHAR, Pattern.compile("\\D"));
+        regex_patterns.put(MATCH_TYPE.CHAR, Pattern.compile("[A-Za-z]"));
         regex_patterns.put(MATCH_TYPE.QUOTATION, Pattern.compile("\"|\'"));
-        regex_patterns.put(MATCH_TYPE.BACKSLASH, Pattern.compile("\\"));
+        regex_patterns.put(MATCH_TYPE.BACKSLASH, Pattern.compile("\\\\"));
         regex_patterns.put(MATCH_TYPE.EQUAL, Pattern.compile("="));
         regex_patterns.put(MATCH_TYPE.DOT, Pattern.compile("\\."));
         regex_patterns.put(MATCH_TYPE.WHITESPACE, Pattern.compile("\\s"));

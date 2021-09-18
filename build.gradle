@@ -1,0 +1,10 @@
+apply plugin: "java"
+
+sourceSets {
+    main.java.srcDir "src/"
+    test.java.srcDir "src/"
+}
+
+jar {
+    manifest.attributes "Main-Class": "src.Main"
+}
