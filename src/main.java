@@ -18,6 +18,5 @@ class Main {
             }
             lexer.cursorForward();
         }
-
     }
 }

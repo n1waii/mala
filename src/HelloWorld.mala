@@ -1,2 +1,2 @@
-number = 123.32
-string = "test"
+let number = 123.32
+let string = "test"

@@ -26,6 +26,7 @@ public class Lexer {
     public Lexeme getLexeme() {
         Lexeme topCache = this.lexeme_cache.get(this.cursor);
         Lexeme lexeme = (topCache != null) ? topCache : this.findNewLexeme();
+        // note: add caching here
 
         return lexeme;
     }
@@ -69,6 +70,7 @@ public class Lexer {
         String currentChar = this.getCurrentCharacter();
         int lineStart = this.getCursorLine();
         int columnStart = this.getCursorColumn();
+        Token token;
 
         while (!this.isExhausted() && (findMatch(MATCH_TYPE.CHAR, currentChar) || findMatch(MATCH_TYPE.DIGIT, currentChar))) {
             lexemeValue.append(currentChar);
@@ -76,8 +78,10 @@ public class Lexer {
             currentChar = this.getCurrentCharacter();
         }
 
+        token = reserved_words.get(lexemeValue.toString());
+
         return new Lexeme(
-            Token.IDENTIFIER,
+            (token != null) ? token : Token.IDENTIFIER,
             lexemeValue.toString(),
             lineStart,
             columnStart
@@ -217,6 +221,7 @@ public class Lexer {
     }
 
     private static void load_reserved() {
+        reserved_words.put("let", Token.LET);
         reserved_words.put("if", Token.IF);
         reserved_words.put("and", Token.AND);
         reserved_words.put("func", Token.FUNCTION);
