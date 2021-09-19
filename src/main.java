@@ -1,10 +1,16 @@
 package src;
 
-import src.compiler.*;
+import java.io.IOException;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import compiler.*;
 
 class Main {
-    public static void main(String[] args) {
-        Lexer lexer = new Lexer("thisIsAnIdentifier = 123.32");
+    public static void main(String[] args) throws IOException {
+        String fileContents = new String(Files.readAllBytes(Paths.get("src/HelloWorld.mala")));
+        Lexer lexer = new Lexer(fileContents);
         while (!lexer.isExhausted()) {
             Lexeme lexeme = lexer.getLexeme();
             if (lexeme != null) {
@@ -12,5 +18,6 @@ class Main {
             }
             lexer.cursorForward();
         }
+
     }
-}   
+}

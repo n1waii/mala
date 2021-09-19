@@ -1,4 +1,4 @@
-package src.compiler;
+package compiler;
 
 enum Token {
     NUMBER, STRING, IDENTIFIER, LEFT_PARENTHESIS, 
