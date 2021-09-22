@@ -1,28 +1,28 @@
 package parser;
 
 import parser.IASTNode;
-import parser.IASTNodeOp;
+import parser.AST_NODE_TYPE;
 
-public class BinExpNode implements IASTNodeOp {
-  private static String type = "BinaryExpressionNode";
-  private String operator;
+public class BinExpNode implements IASTNode {
+  private static AST_NODE_TYPE type = AST_NODE_TYPE.BIN_EXP;
+  private Object value;
   private IASTNode left;
   private IASTNode right;
 
-  public BinExpNode(String operator, IASTNode right, IASTNode left) {
-    this.operator = operator;
+  public BinExpNode(Object value, IASTNode right, IASTNode left) {
+    this.value = value;
     this.left = left;
     this.right = right;
   }
 
   @Override
-  public String getType() {
+  public AST_NODE_TYPE getType() {
     return type;
   }
 
   @Override
-  public String getOperator() {
-    return this.operator;
+  public Object getValue() {
+    return this.value;
   }
 
   @Override
@@ -35,10 +35,14 @@ public class BinExpNode implements IASTNodeOp {
     return this.right;
   }
 
+  public Object getOperator() {
+    return this.getValue();
+  }
+
   public String toString() {
     return String.format(
       "{%nType: %s,%nOperator: %s,%nLeft: %s,%nRight: %s%n}%n",
-      this.getType(), this.getOperator(), this.getLeftNode(), this.getRightNode()
+      this.getType().name(), this.getValue(), this.getLeftNode(), this.getRightNode()
     );
   }
 }

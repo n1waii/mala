@@ -1,9 +1,26 @@
 # Mala
-### A simple programming language inspired by Lua and JavaScript.
+#### A simple dynamic programming language inspired by Lua and JavaScript. Interpreted through a stack-based VM.
 
-## Current Progress
+### Basic Syntax
 
-### Lexical Anaylsis
-* Can tokenize indentifiers, keywords, numbers, and some operators.
+#### Variables
+```
+let x = 5 // number
+let y = .5 // number
+const str = "Hello, World!" // constant string
+str = "Goodbye, World!" // errors
+```
 
-This is still a WIP. I'm also learning Java while making this, so some tips would be appreciated. 
+#### Functions
+```
+// regular functions
+func inc(a) {
+  return a + 1
+}
+
+// lambda functions
+let lamdaInc = lamda x -> x + 1
+
+inc(1) // 2
+lambda_inc(1) // 2
+```

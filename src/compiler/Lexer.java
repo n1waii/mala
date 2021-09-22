@@ -3,10 +3,12 @@ package compiler;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
+import compiler.LexemeToken;
+
 public class Lexer {
     private String input;
     private int cursor;
-    private HashMap<Integer, Lexeme> lexeme_cache = new HashMap<Integer, Lexeme>();
+    //private HashMap<Integer, Lexeme> lexeme_cache = new HashMap<Integer, Lexeme>();
     private int line_number = 1;
     private int column_number = 1;
     private static enum MATCH_TYPE {
@@ -14,21 +16,18 @@ public class Lexer {
         EQUAL, DOT, NEWLINE, TAB, WHITESPACE
     };
     private static HashMap<MATCH_TYPE, Pattern> regex_patterns = new HashMap<MATCH_TYPE, Pattern>();
-    private static HashMap<String, Token> reserved_words = new HashMap<String, Token>();
+    private static HashMap<String, LexemeToken> reserved_words = new HashMap<String, LexemeToken>();
 
     public Lexer(String input) {
         this.input = input;
-        this.cursor = 0;
+        this.cursor = -1;
         compile_regex();
         load_reserved();
     }
 
-    public Lexeme getLexeme() {
-        Lexeme topCache = this.lexeme_cache.get(this.cursor);
-        Lexeme lexeme = (topCache != null) ? topCache : this.findNewLexeme();
-        // note: add caching here
-
-        return lexeme;
+    public Lexeme getNextLexeme() {
+        this.cursorForward();
+        return this.findNewLexeme();
     }
 
     private String getCurrentCharacter() {
@@ -38,28 +37,61 @@ public class Lexer {
         return Character.toString(this.input.charAt(this.cursor));
     }
 
+    private String nextChar() {
+      this.cursorForward();
+      return this.getCurrentCharacter();
+    }
+
     private Lexeme findNewLexeme() {
         if (this.isExhausted()) {
-            return null;
+            return new Lexeme(LexemeToken.EOF, "End Of File", this.getCursorLine(), this.getCursorColumn());
         }
 
         String currentChar = this.getCurrentCharacter();
 
         if (findMatch(MATCH_TYPE.WHITESPACE, currentChar)) {
-            return null;
+            return this.getNextLexeme();
         }
 
-        if (findMatch(MATCH_TYPE.CHAR, currentChar)) {
-            return this.findCharSequence();
-        } else if (findMatch(MATCH_TYPE.QUOTATION, currentChar)) {
-            return this.findStringSequence();
-        } else if (findMatch(MATCH_TYPE.DIGIT, currentChar)) {
-            return this.findNumberSequence();
-        } else if (findMatch(MATCH_TYPE.EQUAL, currentChar)) {
-            return this.findEqualSequence();
+        int currentLine = this.getCursorLine();
+        int currentColumn = this.getCursorColumn();
+
+        switch (currentChar) {
+          case "+":
+            return new Lexeme(LexemeToken.BINARY_ADD, "+", currentLine, currentColumn);
+          case "-":
+            return new Lexeme(LexemeToken.BINARY_SUB, "-", currentLine, currentColumn);
+          case "*":
+            return new Lexeme(LexemeToken.BINARY_MUL, "*", currentLine, currentColumn);
+          case "/":
+            return new Lexeme(LexemeToken.BINARY_DIV, "/", currentLine, currentColumn);
+          case "(":
+            return new Lexeme(LexemeToken.LEFT_PAREN, "(", currentLine, currentColumn);
+          case ")":
+            return new Lexeme(LexemeToken.RIGHT_PAREN, ")", currentLine, currentColumn);
+          case ".":
+            if (findMatch(MATCH_TYPE.DIGIT, this.nextChar())) {
+              this.cursorBack();
+              return this.findNumberSequence();
+            }
+            break;
+          case "=":
+            if (this.nextChar() == "=") {
+                return new Lexeme(LexemeToken.COMP_EQUAL, "==", this.getCursorLine(), this.getCursorColumn());
+            } else {
+                return new Lexeme(LexemeToken.ASSIGNMENT, "=", this.getCursorLine(), this.getCursorColumn());
+            }
+          default:
+            if (findMatch(MATCH_TYPE.CHAR, currentChar)) {
+                return this.findCharSequence();
+            } else if (findMatch(MATCH_TYPE.QUOTATION, currentChar)) {
+                return this.findStringSequence();
+            } else if (findMatch(MATCH_TYPE.DIGIT, currentChar)) {
+                return this.findNumberSequence();
+            }
         }
 
-        return new Lexeme(Token.UNKNOWN, "", this.getCursorLine(), this.getCursorColumn());
+        return new Lexeme(LexemeToken.UNKNOWN, "", this.getCursorLine(), this.getCursorColumn());
     }
 
     private Lexeme findCharSequence() {
@@ -70,7 +102,7 @@ public class Lexer {
         String currentChar = this.getCurrentCharacter();
         int lineStart = this.getCursorLine();
         int columnStart = this.getCursorColumn();
-        Token token;
+        LexemeToken token;
 
         while (!this.isExhausted() && (findMatch(MATCH_TYPE.CHAR, currentChar) || findMatch(MATCH_TYPE.DIGIT, currentChar))) {
             lexemeValue.append(currentChar);
@@ -81,7 +113,7 @@ public class Lexer {
         token = reserved_words.get(lexemeValue.toString());
 
         return new Lexeme(
-            (token != null) ? token : Token.IDENTIFIER,
+            (token != null) ? token : LexemeToken.IDENTIFIER,
             lexemeValue.toString(),
             lineStart,
             columnStart
@@ -104,35 +136,8 @@ public class Lexer {
         }
 
         return new Lexeme(
-            Token.NUMBER,
-            lexemeValue.toString(),
-            lineStart,
-            columnStart
-        );
-    }
-
-    private Lexeme findEqualSequence() {
-        int lineStart = this.getCursorLine();
-        int columnStart = this.getCursorColumn();
-        String lexemeValue = "";
-        Token token;
-
-        this.cursorForward();
-        if (this.isExhausted()) {
-          return null;
-        }
-
-        if (findMatch(MATCH_TYPE.EQUAL, this.getCurrentCharacter())) {
-            token = Token.COMP_EQUAL;
-            lexemeValue = "==";
-        } else {
-            token = Token.ASSIGNMENT;
-            lexemeValue = "=";
-        }
-
-        return new Lexeme(
-            token,
-            lexemeValue,
+            LexemeToken.NUMBER,
+            Double.valueOf(lexemeValue.toString()),
             lineStart,
             columnStart
         );
@@ -154,7 +159,7 @@ public class Lexer {
       }
 
       return new Lexeme(
-          Token.STRING,
+          LexemeToken.STRING,
           lexemeValue.toString(),
           lineStart,
           columnStart
@@ -184,9 +189,9 @@ public class Lexer {
         if (character.contains("\n")) {
           return true;
         } else if (character.contains("\r")) {
-          moveCursor(1);
+          this.moveCursor(1);
           if (this.isExhausted() || (!this.getCurrentCharacter().contains("\n"))) {
-            moveCursor(1);
+            this.moveCursor(1);
           }
           return true;
         }
@@ -221,10 +226,10 @@ public class Lexer {
     }
 
     private static void load_reserved() {
-        reserved_words.put("let", Token.LET);
-        reserved_words.put("if", Token.IF);
-        reserved_words.put("and", Token.AND);
-        reserved_words.put("func", Token.FUNCTION);
+        reserved_words.put("let", LexemeToken.KEYWORD_LET);
+        reserved_words.put("if", LexemeToken.KEYWORD_IF);
+        reserved_words.put("and", LexemeToken.KEYWORD_AND);
+        reserved_words.put("func", LexemeToken.KEYWORD_FUNC);
     }
 
     private static boolean findMatch(MATCH_TYPE matchType, String toFind) {
