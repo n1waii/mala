@@ -1,6 +1,6 @@
-package parser;
+package compiler.parser;
 
-import parser.IASTNode;
+import compiler.parser.IASTNode;
 
 public abstract class NumLiteralNode implements IASTNode {
   private static AST_NODE_TYPE type = AST_NODE_TYPE.NUM_LITERAL;

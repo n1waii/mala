@@ -1,6 +1,8 @@
-package parser;
+package compiler.parser;
 
-import parser.AST_NODE_TYPE;
+import java.lang.Object;
+
+import compiler.parser.AST_NODE_TYPE;
 
 interface IASTNode {
   AST_NODE_TYPE getType();

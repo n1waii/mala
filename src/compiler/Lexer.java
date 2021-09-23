@@ -10,7 +10,7 @@ public class Lexer {
     private int cursor;
     //private HashMap<Integer, Lexeme> lexeme_cache = new HashMap<Integer, Lexeme>();
     private int line_number = 1;
-    private int column_number = 1;
+    private int column_number = 0;
     private static enum MATCH_TYPE {
         DIGIT, CHAR, QUOTATION, BACKSLASH,
         EQUAL, DOT, NEWLINE, TAB, WHITESPACE
@@ -27,7 +27,9 @@ public class Lexer {
 
     public Lexeme getNextLexeme() {
         this.cursorForward();
-        return this.findNewLexeme();
+        System.out.println(this.cursor);
+        Lexeme lexeme = this.findNewLexeme();
+        return lexeme;
     }
 
     private String getCurrentCharacter() {
@@ -47,15 +49,21 @@ public class Lexer {
             return new Lexeme(LexemeToken.EOF, "End Of File", this.getCursorLine(), this.getCursorColumn());
         }
 
-        String currentChar = this.getCurrentCharacter();
+        if (findMatch(MATCH_TYPE.WHITESPACE, this.getCurrentCharacter())) {
+            System.out.println(this.getCurrentCharacter() + this.cursor);
+            while (!this.isExhausted() && findMatch(MATCH_TYPE.WHITESPACE, this.getCurrentCharacter())) {
+              this.cursorForward();
+            };
 
-        if (findMatch(MATCH_TYPE.WHITESPACE, currentChar)) {
-            return this.getNextLexeme();
+            if (this.isExhausted()) {
+              return new Lexeme(LexemeToken.EOF, "End Of File", this.getCursorLine(), this.getCursorColumn());
+            }
         }
 
+        String currentChar = this.getCurrentCharacter();
         int currentLine = this.getCursorLine();
         int currentColumn = this.getCursorColumn();
-
+        System.out.println(currentChar + this.cursor);
         switch (currentChar) {
           case "+":
             return new Lexeme(LexemeToken.BINARY_ADD, "+", currentLine, currentColumn);
@@ -79,7 +87,7 @@ public class Lexer {
             if (this.nextChar() == "=") {
                 return new Lexeme(LexemeToken.COMP_EQUAL, "==", this.getCursorLine(), this.getCursorColumn());
             } else {
-                return new Lexeme(LexemeToken.ASSIGNMENT, "=", this.getCursorLine(), this.getCursorColumn());
+                return new Lexeme(LexemeToken.ASSIGNMENT, "=", this.getCursorLine(), this.getCursorColumn()-1);
             }
           default:
             if (findMatch(MATCH_TYPE.CHAR, currentChar)) {
@@ -106,8 +114,7 @@ public class Lexer {
 
         while (!this.isExhausted() && (findMatch(MATCH_TYPE.CHAR, currentChar) || findMatch(MATCH_TYPE.DIGIT, currentChar))) {
             lexemeValue.append(currentChar);
-            this.cursorForward();
-            currentChar = this.getCurrentCharacter();
+            currentChar = this.nextChar();
         }
 
         token = reserved_words.get(lexemeValue.toString());
@@ -132,8 +139,11 @@ public class Lexer {
         while (!this.isExhausted() &&
             (findMatch(MATCH_TYPE.DIGIT, this.getCurrentCharacter()) || findMatch(MATCH_TYPE.DOT, this.getCurrentCharacter()))) {
             lexemeValue.append(this.getCurrentCharacter());
+            //System.out.println("before: " + this.cursor);
             this.cursorForward();
+            //System.out.println("after: " + this.cursor);
         }
+        this.cursorBack();
 
         return new Lexeme(
             LexemeToken.NUMBER,
@@ -155,7 +165,7 @@ public class Lexer {
 
       while (!this.isExhausted() && !findMatch(MATCH_TYPE.QUOTATION, this.getCurrentCharacter())) {
         lexemeValue.append(this.getCurrentCharacter());
-        this.cursorForward();
+        this.nextChar();
       }
 
       return new Lexeme(
@@ -201,6 +211,7 @@ public class Lexer {
 
     public void cursorBack() {
         this.cursor -= 1;
+        this.column_number -= 1;
     }
 
     public boolean isExhausted() {
@@ -221,7 +232,7 @@ public class Lexer {
         regex_patterns.put(MATCH_TYPE.QUOTATION, Pattern.compile("\"|\'"));
         regex_patterns.put(MATCH_TYPE.BACKSLASH, Pattern.compile("\\\\"));
         regex_patterns.put(MATCH_TYPE.EQUAL, Pattern.compile("="));
-        regex_patterns.put(MATCH_TYPE.DOT, Pattern.compile("\\."));
+        regex_patterns.put(MATCH_TYPE.DOT, Pattern.compile("[.]"));
         regex_patterns.put(MATCH_TYPE.WHITESPACE, Pattern.compile("\\s"));
     }
 

@@ -1,4 +1,4 @@
-package parser;
+package compiler.parser;
 
 enum AST_NODE_TYPE {
   PROGRAM, VAR_DEF, VAR_ASSIGN,

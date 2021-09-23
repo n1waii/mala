@@ -1,7 +1,7 @@
-package parser;
+package compiler.parser;
 
-import parser.IASTNode;
-import parser.AST_NODE_TYPE;
+import compiler.parser.IASTNode;
+import compiler.parser.AST_NODE_TYPE;
 
 public class BinExpNode implements IASTNode {
   private static AST_NODE_TYPE type = AST_NODE_TYPE.BIN_EXP;

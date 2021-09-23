@@ -6,5 +6,5 @@ sourceSets {
 }
 
 jar {
-    manifest.attributes "Main-Class": "src.Main"
+    manifest.attributes "Main-Class": "compiler.Main"
 }
