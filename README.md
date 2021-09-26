@@ -1,6 +1,16 @@
 # Mala
 #### A simple dynamic programming language inspired by Lua and JavaScript. Interpreted through a stack-based VM.
 
+### Truthy/Falsy Values
+
+| Value            | Is Truthy?           |
+|------------------|----------------------|
+| true             | yes (duh)            |
+| false            | no (also duh)        |
+| any number value | yes                  |
+| null             | no                   |
+| strings          | yes, even empty ones |
+
 ### Basic Syntax
 
 #### Variables
@@ -14,7 +24,7 @@ str = "Goodbye, World!" // errors
 #### Functions
 ```
 // regular functions
-func inc(a) {
+function inc(a) {
   return a + 1
 }
 
@@ -23,4 +33,22 @@ let lamdaInc = lamda x -> x + 1
 
 inc(1) // 2
 lambda_inc(1) // 2
+```
+
+#### Conditionals
+```
+// if statements
+if (1 == 2) {  // parenthesis enclosing expression are OPTIONAL
+
+}
+
+if (true && true) {
+
+}
+
+if (true || false) {
+
+}
+
+// might implement ternary operators, but not too sure
 ```

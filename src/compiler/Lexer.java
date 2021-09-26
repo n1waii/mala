@@ -6,6 +6,14 @@ import java.util.regex.Pattern;
 import compiler.LexemeToken;
 
 public class Lexer {
+    interface ITokenizerPredicate {
+        boolean isTrue();
+    }
+
+    enum TokenizerType {
+      CHAR_SEQUENCE, STRING_SEQUENCE, NUMBER_SEQUENCE
+    }
+
     private String input;
     private int cursor;
     //private HashMap<Integer, Lexeme> lexeme_cache = new HashMap<Integer, Lexeme>();
@@ -17,16 +25,17 @@ public class Lexer {
     };
     private static HashMap<MATCH_TYPE, Pattern> regex_patterns = new HashMap<MATCH_TYPE, Pattern>();
     private static HashMap<String, LexemeToken> reserved_words = new HashMap<String, LexemeToken>();
+    private HashMap<TokenizerType, ITokenizerPredicate> tokenizer_predicates = new HashMap<TokenizerType, ITokenizerPredicate>();
 
     public Lexer(String input) {
         this.input = input;
-        this.cursor = -1;
+        this.cursor = 0;
         compile_regex();
         load_reserved();
+        this.load_predicate_checks(); // must be non static for reference to object
     }
 
     public Lexeme getNextLexeme() {
-        this.cursorForward();
         System.out.println(this.cursor);
         Lexeme lexeme = this.findNewLexeme();
         return lexeme;
@@ -39,9 +48,12 @@ public class Lexer {
         return Character.toString(this.input.charAt(this.cursor));
     }
 
-    private String nextChar() {
-      this.cursorForward();
-      return this.getCurrentCharacter();
+    private String peekNextChar() {
+      if (this.cursor+1 <= this.input.length()) {
+        return Character.toString(this.input.charAt(this.cursor+1));
+      }
+
+      return null;
     }
 
     private Lexeme findNewLexeme() {
@@ -66,27 +78,35 @@ public class Lexer {
         System.out.println(currentChar + this.cursor);
         switch (currentChar) {
           case "+":
-            return new Lexeme(LexemeToken.BINARY_ADD, "+", currentLine, currentColumn);
+            this.cursorForward();
+            return new Lexeme(LexemeToken.BINARY_ADD, "+", currentLine, currentColumn-1);
           case "-":
-            return new Lexeme(LexemeToken.BINARY_SUB, "-", currentLine, currentColumn);
+            this.cursorForward();
+            return new Lexeme(LexemeToken.BINARY_SUB, "-", currentLine, currentColumn-1);
           case "*":
-            return new Lexeme(LexemeToken.BINARY_MUL, "*", currentLine, currentColumn);
+            this.cursorForward();
+            return new Lexeme(LexemeToken.BINARY_MUL, "*", currentLine, currentColumn-1);
           case "/":
-            return new Lexeme(LexemeToken.BINARY_DIV, "/", currentLine, currentColumn);
+            this.cursorForward();
+            return new Lexeme(LexemeToken.BINARY_DIV, "/", currentLine, currentColumn-1);
           case "(":
-            return new Lexeme(LexemeToken.LEFT_PAREN, "(", currentLine, currentColumn);
+            this.cursorForward();
+            return new Lexeme(LexemeToken.LEFT_PAREN, "(", currentLine, currentColumn-1);
           case ")":
-            return new Lexeme(LexemeToken.RIGHT_PAREN, ")", currentLine, currentColumn);
+            this.cursorForward();
+            return new Lexeme(LexemeToken.RIGHT_PAREN, ")", currentLine, currentColumn-1);
           case ".":
-            if (findMatch(MATCH_TYPE.DIGIT, this.nextChar())) {
-              this.cursorBack();
+            if (findMatch(MATCH_TYPE.DIGIT, this.peekNextChar())) {
               return this.findNumberSequence();
             }
             break;
           case "=":
-            if (this.nextChar() == "=") {
-                return new Lexeme(LexemeToken.COMP_EQUAL, "==", this.getCursorLine(), this.getCursorColumn());
+            String nextChar = this.peekNextChar();
+            if (nextChar != null && nextChar == "=") {
+                this.moveCursor(2); // move it up twice to close the '==' token
+                return new Lexeme(LexemeToken.COMP_EQUAL, "==", this.getCursorLine(), this.getCursorColumn()-2);
             } else {
+                this.cursorForward();
                 return new Lexeme(LexemeToken.ASSIGNMENT, "=", this.getCursorLine(), this.getCursorColumn()-1);
             }
           default:
@@ -106,18 +126,19 @@ public class Lexer {
         // should allow characters trailing numbers(i.e. foo123)
         // valid: foo123
         // invalid: 123foo (cannot start with digit)
+
+        ITokenizerPredicate charSequencePredicate = this.tokenizer_predicates.get(TokenizerType.CHAR_SEQUENCE);
         StringBuilder lexemeValue = new StringBuilder();
-        String currentChar = this.getCurrentCharacter();
         int lineStart = this.getCursorLine();
         int columnStart = this.getCursorColumn();
         LexemeToken token;
 
-        while (!this.isExhausted() && (findMatch(MATCH_TYPE.CHAR, currentChar) || findMatch(MATCH_TYPE.DIGIT, currentChar))) {
-            lexemeValue.append(currentChar);
-            currentChar = this.nextChar();
-        }
+        do {
+          lexemeValue.append(this.getCurrentCharacter());
+          this.cursorForward();
+        } while (charSequencePredicate.isTrue());
 
-        token = reserved_words.get(lexemeValue.toString());
+        token = reserved_words.get(lexemeValue.toString()); // see if its a reserved word(keyword)
 
         return new Lexeme(
             (token != null) ? token : LexemeToken.IDENTIFIER,
@@ -131,19 +152,15 @@ public class Lexer {
         // raw digits(i.e. 1234, 0001, 0101)
         // trailing zeros are allowed(but get tokenized without)
         // i.e 0001 becomes 1
-
+        ITokenizerPredicate numberSequencePredicate = this.tokenizer_predicates.get(TokenizerType.NUMBER_SEQUENCE);
         StringBuilder lexemeValue = new StringBuilder();
         int lineStart = this.getCursorLine();
         int columnStart = this.getCursorColumn();
 
-        while (!this.isExhausted() &&
-            (findMatch(MATCH_TYPE.DIGIT, this.getCurrentCharacter()) || findMatch(MATCH_TYPE.DOT, this.getCurrentCharacter()))) {
-            lexemeValue.append(this.getCurrentCharacter());
-            //System.out.println("before: " + this.cursor);
-            this.cursorForward();
-            //System.out.println("after: " + this.cursor);
-        }
-        this.cursorBack();
+        do {
+          lexemeValue.append(this.getCurrentCharacter());
+          this.cursorForward();
+        } while (numberSequencePredicate.isTrue());
 
         return new Lexeme(
             LexemeToken.NUMBER,
@@ -154,23 +171,26 @@ public class Lexer {
     }
 
     private Lexeme findStringSequence() {
+      ITokenizerPredicate stringSequencePredicate = this.tokenizer_predicates.get(TokenizerType.STRING_SEQUENCE);
       StringBuilder lexemeValue = new StringBuilder();
       int lineStart = this.getCursorLine();
       int columnStart = this.getCursorColumn();
 
       this.cursorForward();
-      if (this.isExhausted()) {
+      if (!stringSequencePredicate.isTrue()) {
         return null;
       }
 
-      while (!this.isExhausted() && !findMatch(MATCH_TYPE.QUOTATION, this.getCurrentCharacter())) {
+      do {
         lexemeValue.append(this.getCurrentCharacter());
-        this.nextChar();
-      }
+        this.cursorForward();
+      } while (stringSequencePredicate.isTrue());
+
+      this.cursorForward(); // move cursor up from last quoation mark
 
       return new Lexeme(
           LexemeToken.STRING,
-          lexemeValue.toString(),
+          lexemeValue.toString().substring(0, lexemeValue.length()), // remove the last quotation mark
           lineStart,
           columnStart
       );
@@ -240,7 +260,34 @@ public class Lexer {
         reserved_words.put("let", LexemeToken.KEYWORD_LET);
         reserved_words.put("if", LexemeToken.KEYWORD_IF);
         reserved_words.put("and", LexemeToken.KEYWORD_AND);
-        reserved_words.put("func", LexemeToken.KEYWORD_FUNC);
+        reserved_words.put("function", LexemeToken.KEYWORD_FUNC);
+    }
+
+    private void load_predicate_checks() {
+      Lexer lexer = this;
+      ITokenizerPredicate charSequencePredicate = new ITokenizerPredicate() {
+        public boolean isTrue() {
+          return (!lexer.isExhausted() &&
+              (findMatch(MATCH_TYPE.CHAR, lexer.getCurrentCharacter()) || findMatch(MATCH_TYPE.DIGIT, lexer.getCurrentCharacter())));
+        }
+      };
+
+      ITokenizerPredicate stringSequencePredicate = new ITokenizerPredicate() {
+        public boolean isTrue() {
+          return (!lexer.isExhausted() && !findMatch(MATCH_TYPE.QUOTATION, lexer.getCurrentCharacter()));
+        }
+      };
+
+      ITokenizerPredicate numberSequencePredicate = new ITokenizerPredicate() {
+        public boolean isTrue() {
+          return (!lexer.isExhausted() &&
+              (findMatch(MATCH_TYPE.DIGIT, lexer.getCurrentCharacter()) || findMatch(MATCH_TYPE.DOT, lexer.getCurrentCharacter())));
+        }
+      };
+
+      lexer.tokenizer_predicates.put(TokenizerType.CHAR_SEQUENCE, charSequencePredicate);
+      lexer.tokenizer_predicates.put(TokenizerType.STRING_SEQUENCE, stringSequencePredicate);
+      lexer.tokenizer_predicates.put(TokenizerType.NUMBER_SEQUENCE, numberSequencePredicate);
     }
 
     private static boolean findMatch(MATCH_TYPE matchType, String toFind) {
