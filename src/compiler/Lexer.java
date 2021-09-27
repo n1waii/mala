@@ -3,8 +3,6 @@ package compiler;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import compiler.LexemeToken;
-
 public class Lexer {
     interface ITokenizerPredicate {
         boolean isTrue();
@@ -107,7 +105,7 @@ public class Lexer {
                 return new Lexeme(LexemeToken.COMP_EQUAL, "==", this.getCursorLine(), this.getCursorColumn()-2);
             } else {
                 this.cursorForward();
-                return new Lexeme(LexemeToken.ASSIGNMENT, "=", this.getCursorLine(), this.getCursorColumn()-1);
+                return new Lexeme(LexemeToken.ASSIGNMENT_OP, "=", this.getCursorLine(), this.getCursorColumn()-1);
             }
           default:
             if (findMatch(MATCH_TYPE.CHAR, currentChar)) {

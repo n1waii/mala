@@ -1,7 +1,5 @@
 package compiler;
 
-import compiler.LexemeToken;
-
 public class Lexeme {
     private LexemeToken token;
     private int line;
