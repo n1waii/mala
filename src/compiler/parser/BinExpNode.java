@@ -5,11 +5,11 @@ import compiler.parser.AST_NODE_TYPE;
 
 public class BinExpNode implements IASTNode {
   private static AST_NODE_TYPE type = AST_NODE_TYPE.BIN_EXP;
-  private Object value;
+  private String value;
   private IASTNode left;
   private IASTNode right;
 
-  public BinExpNode(Object value, IASTNode right, IASTNode left) {
+  public BinExpNode(String value, IASTNode right, IASTNode left) {
     this.value = value;
     this.left = left;
     this.right = right;
@@ -21,7 +21,7 @@ public class BinExpNode implements IASTNode {
   }
 
   @Override
-  public Object getValue() {
+  public String getValue() {
     return this.value;
   }
 

@@ -2,6 +2,7 @@ package compiler;
 
 import java.util.HashMap;
 import java.util.regex.Pattern;
+import java.util.ArrayList;
 
 public class Lexer {
     interface ITokenizerPredicate {
@@ -16,7 +17,7 @@ public class Lexer {
     private int cursor;
     //private HashMap<Integer, Lexeme> lexeme_cache = new HashMap<Integer, Lexeme>();
     private int line_number = 1;
-    private int column_number = 0;
+    private int column_number = 1;
     private static enum MATCH_TYPE {
         DIGIT, CHAR, QUOTATION, BACKSLASH,
         EQUAL, DOT, NEWLINE, TAB, WHITESPACE
@@ -31,6 +32,14 @@ public class Lexer {
         compile_regex();
         load_reserved();
         this.load_predicate_checks(); // must be non static for reference to object
+    }
+
+    public ArrayList<Lexeme> tokenizeAll() { // should only be used for unit testing
+      ArrayList<Lexeme> lexemes = new ArrayList<Lexeme>();
+      while (!this.isExhausted()) {
+          lexemes.add(this.getNextLexeme());
+      }
+      return lexemes;
     }
 
     public Lexeme getNextLexeme() {
@@ -73,26 +82,26 @@ public class Lexer {
         String currentChar = this.getCurrentCharacter();
         int currentLine = this.getCursorLine();
         int currentColumn = this.getCursorColumn();
-        System.out.println(currentChar + this.cursor);
+
         switch (currentChar) {
           case "+":
             this.cursorForward();
-            return new Lexeme(LexemeToken.BINARY_ADD, "+", currentLine, currentColumn-1);
+            return new Lexeme(LexemeToken.BINARY_ADD, "+", currentLine, currentColumn);
           case "-":
             this.cursorForward();
-            return new Lexeme(LexemeToken.BINARY_SUB, "-", currentLine, currentColumn-1);
+            return new Lexeme(LexemeToken.BINARY_SUB, "-", currentLine, currentColumn);
           case "*":
             this.cursorForward();
-            return new Lexeme(LexemeToken.BINARY_MUL, "*", currentLine, currentColumn-1);
+            return new Lexeme(LexemeToken.BINARY_MUL, "*", currentLine, currentColumn);
           case "/":
             this.cursorForward();
-            return new Lexeme(LexemeToken.BINARY_DIV, "/", currentLine, currentColumn-1);
+            return new Lexeme(LexemeToken.BINARY_DIV, "/", currentLine, currentColumn);
           case "(":
             this.cursorForward();
-            return new Lexeme(LexemeToken.LEFT_PAREN, "(", currentLine, currentColumn-1);
+            return new Lexeme(LexemeToken.LEFT_PAREN, "(", currentLine, currentColumn);
           case ")":
             this.cursorForward();
-            return new Lexeme(LexemeToken.RIGHT_PAREN, ")", currentLine, currentColumn-1);
+            return new Lexeme(LexemeToken.RIGHT_PAREN, ")", currentLine, currentColumn);
           case ".":
             if (findMatch(MATCH_TYPE.DIGIT, this.peekNextChar())) {
               return this.findNumberSequence();

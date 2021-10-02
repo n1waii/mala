@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="LexerTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-10-02T18:20:08" hostname="YOUPENDRADESKTO" time="0.027">
+  <properties/>
+  <testcase name="shouldTokenizeExpressions()" classname="LexerTests" time="0.027"/>
+  <system-out><![CDATA[0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
