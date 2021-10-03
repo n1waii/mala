@@ -20,4 +20,5 @@ test {
 
 jar {
     manifest.attributes "Main-Class": "compiler.Main"
+		manifest.attributes "Class-Path" : "tests/"
 }

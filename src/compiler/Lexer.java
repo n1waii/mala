@@ -15,6 +15,8 @@ public class Lexer {
 
     private String input;
     private int cursor;
+    private Lexeme current_lexeme;
+    private Lexeme last_lexeme;
     //private HashMap<Integer, Lexeme> lexeme_cache = new HashMap<Integer, Lexeme>();
     private int line_number = 1;
     private int column_number = 1;
@@ -43,9 +45,18 @@ public class Lexer {
     }
 
     public Lexeme getNextLexeme() {
-        System.out.println(this.cursor);
+        this.last_lexeme = this.current_lexeme;
         Lexeme lexeme = this.findNewLexeme();
+        this.current_lexeme = lexeme;
         return lexeme;
+    }
+
+    public Lexeme getCurrentLexeme() {
+      return this.current_lexeme;
+    }
+
+    public Lexeme getLastLexeme() {
+      return this.last_lexeme;
     }
 
     private String getCurrentCharacter() {
@@ -107,6 +118,9 @@ public class Lexer {
               return this.findNumberSequence();
             }
             break;
+          case ",":
+            this.cursorForward();
+            return new Lexeme(LexemeToken.COMMA, ",", currentLine, currentColumn);
           case "=":
             String nextChar = this.peekNextChar();
             if (nextChar != null && nextChar == "=") {

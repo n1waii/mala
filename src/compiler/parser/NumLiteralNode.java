@@ -4,11 +4,11 @@ import compiler.parser.IASTNode;
 
 public class NumLiteralNode implements IASTNode {
   private static AST_NODE_TYPE type = AST_NODE_TYPE.NUM_LITERAL;
-  private Integer value;
+  private Double value;
   private IASTNode left;
   private IASTNode right;
 
-  public NumLiteralNode(Integer value) {
+  public NumLiteralNode(Double value) {
     this.value = value;
   }
 
@@ -18,7 +18,7 @@ public class NumLiteralNode implements IASTNode {
   }
 
   @Override
-  public Integer getValue() {
+  public Double getValue() {
     return this.value;
   }
 
