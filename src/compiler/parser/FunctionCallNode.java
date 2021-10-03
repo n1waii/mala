@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import compiler.parser.IASTNode;
 
 public class FunctionCallNode implements IASTNode {
-  private static AST_NODE_TYPE type = AST_NODE_TYPE.VAR_ASSIGN;
+  private static AST_NODE_TYPE type = AST_NODE_TYPE.FUNC_CALL;
   private String name;
   private ArrayList<IASTNode> arguments;
   private IASTNode left;

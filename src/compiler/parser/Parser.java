@@ -133,11 +133,13 @@ public class Parser {
       Lexeme currentLexeme = this.lexer.getCurrentLexeme();
       if (currentLexeme != null) {
         if (!expression_operators.containsKey(currentLexeme.getToken())) { // end of function call
-          return new FunctionCallNode((String) functionName.getValue(), arguments);
+          break;
         }
       }
       this.expectCurrentToken(LexemeToken.COMMA);
     }
+    
+    return new FunctionCallNode((String) functionName.getValue(), arguments);
   }
 
   public IASTNode parse() {
