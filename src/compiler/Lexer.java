@@ -80,7 +80,6 @@ public class Lexer {
         }
 
         if (findMatch(MATCH_TYPE.WHITESPACE, this.getCurrentCharacter())) {
-            System.out.println(this.getCurrentCharacter() + this.cursor);
             while (!this.isExhausted() && findMatch(MATCH_TYPE.WHITESPACE, this.getCurrentCharacter())) {
               this.cursorForward();
             };

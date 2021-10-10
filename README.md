@@ -12,11 +12,17 @@
 | strings          | yes, even empty ones |
 
 ### Basic Syntax
+Please note not all these features are implemented and not guaranteed to be implemented. This file is only serving as a guideline for me.
 
 #### Variables
 ```
 let x = 5 // number
 let y = .5 // number
+let list = ["foo", "bar"]
+
+log(list[0]) // "foo"
+log(list[#list]) // "bar"
+
 const str = "Hello, World!" // constant string
 str = "Goodbye, World!" // errors
 ```
@@ -42,13 +48,28 @@ if (1 == 2) {  // parenthesis enclosing expression are OPTIONAL
 
 }
 
-if (true && true) {
+if (true and true) {
 
 }
 
-if (true || false) {
+if (true or false) {
 
 }
+```
 
-// might implement ternary operators, but not too sure
+#### Loops
+```
+// numerical loops
+// for VAR in [START..END], STEP = 1
+for let i in [1..5, 1] {
+  log(i) // prints 1 to 5, both inclusive
+}
+
+// key-value loops
+let LIST = ["a", "b", "c"]
+
+// for VAR [K, V?] of LIST
+for let [K, V] of LIST {
+  log(K, V) // prints index and value of each element
+}
 ```

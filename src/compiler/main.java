@@ -13,7 +13,7 @@ class Main {
         String fileContents = new String(Files.readAllBytes(Paths.get("src/HelloWorld.mala")));
         Lexer lexer = new Lexer(fileContents);
         Parser parser = new Parser(lexer);
-        IASTNode program = parser.Parse();
-        
+        IASTNode program = parser.parse();
+        System.out.println(program);
     }
 }
