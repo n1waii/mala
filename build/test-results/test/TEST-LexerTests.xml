@@ -1,7 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="LexerTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-10-03T15:54:27" hostname="YOUPENDRADESKTO" time="0.014">
+<testsuite name="LexerTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2021-10-23T01:19:50" hostname="YOUPENDRADESKTO" time="0.031">
   <properties/>
-  <testcase name="shouldTokenizeExpressions()" classname="LexerTests" time="0.014"/>
-  <system-out><![CDATA[]]></system-out>
+  <testcase name="shouldTokenizeVariableDef()" classname="LexerTests" time="0.027"/>
+  <testcase name="shouldTokenizeExpressions()" classname="LexerTests" time="0.001"/>
+  <testcase name="shouldTokenizeFunctionCall()" classname="LexerTests" time="0.001"/>
+  <system-out><![CDATA[0 | {
+	Token: KEYWORD_LET,
+	Value: let,
+	Line, Column: 1, 1
+}
+
+1 | {
+	Token: IDENTIFIER,
+	Value: x,
+	Line, Column: 1, 5
+}
+
+2 | {
+	Token: ASSIGNMENT_OP,
+	Value: =,
+	Line, Column: 1, 7
+}
+
+3 | {
+	Token: NUMBER,
+	Value: 1.0,
+	Line, Column: 1, 9
+}
+
+4 | {
+	Token: BINARY_ADD,
+	Value: +,
+	Line, Column: 1, 11
+}
+
+5 | {
+	Token: NUMBER,
+	Value: 2.0,
+	Line, Column: 1, 13
+}
+
+]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

@@ -36,7 +36,7 @@ public class ProgramNode implements IASTNode {
 
   public String toString() {
     return String.format(
-      "{%nType: %s,%nValue: %s%n}%n",
+      "{%n  Type: %s,%n  Value: %s%n}%n",
       this.getType().name(), this.getValue()
     );
   }

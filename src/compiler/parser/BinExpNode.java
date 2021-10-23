@@ -41,7 +41,7 @@ public class BinExpNode implements IASTNode {
 
   public String toString() {
     return String.format(
-      "{%nType: %s,%nOperator: %s,%nLeft: %s,%nRight: %s%n}%n",
+      "{%n  Type: %s,%n  Operator: %s,%n  Left: %s,%n  Right: %s%n}%n",
       this.getType().name(), this.getValue(), this.getLeftNode(), this.getRightNode()
     );
   }

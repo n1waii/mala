@@ -1,0 +1,36 @@
+0 | {
+	Token: KEYWORD_LET,
+	Value: let,
+	Line, Column: 1, 1
+}
+
+1 | {
+	Token: IDENTIFIER,
+	Value: x,
+	Line, Column: 1, 5
+}
+
+2 | {
+	Token: ASSIGNMENT_OP,
+	Value: =,
+	Line, Column: 1, 7
+}
+
+3 | {
+	Token: NUMBER,
+	Value: 1.0,
+	Line, Column: 1, 9
+}
+
+4 | {
+	Token: BINARY_ADD,
+	Value: +,
+	Line, Column: 1, 11
+}
+
+5 | {
+	Token: NUMBER,
+	Value: 2.0,
+	Line, Column: 1, 13
+}
+

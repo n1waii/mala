@@ -15,7 +15,7 @@
 Please note not all these features are implemented and not guaranteed to be implemented. This file is only serving as a guideline for me.
 
 #### Variables
-```
+```js
 let x = 5 // number
 let y = .5 // number
 let list = ["foo", "bar"]
@@ -28,9 +28,9 @@ str = "Goodbye, World!" // errors
 ```
 
 #### Functions
-```
+```js
 // regular functions
-function inc(a) {
+func inc(a) {
   return a + 1
 }
 
@@ -42,7 +42,7 @@ lambda_inc(1) // 2
 ```
 
 #### Conditionals
-```
+```lua
 // if statements
 if (1 == 2) {  // parenthesis enclosing expression are OPTIONAL
 
@@ -55,10 +55,15 @@ if (true and true) {
 if (true or false) {
 
 }
+
+if (not false) {
+
+}
+
 ```
 
 #### Loops
-```
+```js
 // numerical loops
 // for VAR in [START..END], STEP = 1
 for let i in [1..5, 1] {

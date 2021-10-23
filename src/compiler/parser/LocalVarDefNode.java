@@ -19,12 +19,12 @@ public class LocalVarDefNode implements IASTNode {
   }
 
   @Override
-  public String getValue() {
-    return this.value;
+  public IASTNode getValue() {
+    return this.right;
   }
 
   public String getVariable() {
-    return this.getValue();
+    return this.value;
   }
 
   @Override
@@ -39,8 +39,8 @@ public class LocalVarDefNode implements IASTNode {
 
   public String toString() {
     return String.format(
-      "{%nType: %s,%nValue: %s%n}%n",
-      this.getType().name(), this.getValue()
+      "{%n  Type: %s,%n  Name: %s%n   Value: %s%n}%n",
+      this.getType().name(), this.getVariable(), this.getValue()
     );
   }
 }

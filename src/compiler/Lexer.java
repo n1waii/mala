@@ -76,7 +76,7 @@ public class Lexer {
 
     private Lexeme findNewLexeme() {
         if (this.isExhausted()) {
-            return new Lexeme(LexemeToken.EOF, "End Of File", this.getCursorLine(), this.getCursorColumn());
+            return new Lexeme(LexemeToken.EOF, "eof", this.getCursorLine(), this.getCursorColumn());
         }
 
         if (findMatch(MATCH_TYPE.WHITESPACE, this.getCurrentCharacter())) {
@@ -85,7 +85,7 @@ public class Lexer {
             };
 
             if (this.isExhausted()) {
-              return new Lexeme(LexemeToken.EOF, "End Of File", this.getCursorLine(), this.getCursorColumn());
+              return new Lexeme(LexemeToken.EOF, "eof", this.getCursorLine(), this.getCursorColumn());
             }
         }
 
