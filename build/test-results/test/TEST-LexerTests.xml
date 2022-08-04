@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="LexerTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2021-10-23T01:19:50" hostname="YOUPENDRADESKTO" time="0.031">
+<testsuite name="LexerTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2022-08-04T22:25:23" hostname="YOUPENDRADESKTO" time="0.133">
   <properties/>
-  <testcase name="shouldTokenizeVariableDef()" classname="LexerTests" time="0.027"/>
-  <testcase name="shouldTokenizeExpressions()" classname="LexerTests" time="0.001"/>
-  <testcase name="shouldTokenizeFunctionCall()" classname="LexerTests" time="0.001"/>
+  <testcase name="shouldTokenizeVariableDef()" classname="LexerTests" time="0.106"/>
+  <testcase name="shouldTokenizeExpressions()" classname="LexerTests" time="0.008"/>
+  <testcase name="shouldTokenizeFunctionCall()" classname="LexerTests" time="0.004"/>
   <system-out><![CDATA[0 | {
 	Token: KEYWORD_LET,
 	Value: let,

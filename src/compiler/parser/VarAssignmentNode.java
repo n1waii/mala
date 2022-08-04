@@ -24,7 +24,7 @@ public class VarAssignmentNode implements IASTNode {
   }
 
   public String getVariable() {
-    return this.getValue();
+	return this.getValue();
   }
 
   @Override

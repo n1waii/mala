@@ -25,6 +25,10 @@ public class BinExpNode implements IASTNode {
     return this.value;
   }
 
+  public String getVariable() {
+    return this.value;
+  }
+
   @Override
   public IASTNode getLeftNode() {
     return this.left;

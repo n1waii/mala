@@ -58,6 +58,7 @@ public class Parser {
       ) {
       Lexeme lexeme = this.lexer.getCurrentLexeme();
       switch (lexeme.getToken()) {
+		// add identifier
         case NUMBER:
           operands.push(new NumLiteralNode((Double) lexeme.getValue()));
           this.lexer.getNextLexeme();
@@ -162,7 +163,7 @@ public class Parser {
     return new FunctionCallNode((String) functionName.getValue(), arguments);
   }
 
-  public IASTNode parse() {
+  public ProgramNode parse() {
       ArrayList<IASTNode> body = new ArrayList<IASTNode>();
 
       this.lexer.getNextLexeme();
@@ -187,6 +188,7 @@ public class Parser {
               throwError(lexeme, "Unexpected token");
             }
             break;
+            
           default: break;
         }
       }
